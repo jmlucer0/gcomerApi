@@ -25,7 +25,7 @@ public class Cliente {
     @NotBlank
     private String nombre;
     @NotNull
-    @Min(value = 100000)
+    @Pattern(regexp = "\\d{6,10}")
     private String telefono;
     private String direccion;
     private boolean activo;
