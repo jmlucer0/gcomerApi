@@ -17,25 +17,25 @@ import java.net.URI;
 @RequestMapping("/cliente")
 public class ClienteController {
 
-    private ClienteRepository clienteRepository;
+    private ClienteService clienteService;
 
-    public ClienteController(ClienteRepository clienteRepository){
-        this.clienteRepository = clienteRepository;
+    public ClienteController(ClienteService clienteService){
+        this.clienteService = clienteService;
     }
 
     @GetMapping
     public ResponseEntity<Page<Cliente>> listarClientes(@PageableDefault(size = 5)Pageable pageable){
-        Pageable sortedByDateDesc = PageRequest.of(
+        Pageable sortedByIdDesc = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "id")
         );
-        return ResponseEntity.ok(clienteRepository.findByActivoTrue(sortedByDateDesc));
+        return ResponseEntity.ok(clienteService.findByActivoTrue(sortedByIdDesc));
     }
 
     @PostMapping
-    public ResponseEntity<DatosCliente> registrarCliente (@RequestBody  DatosCliente datosCliente, UriComponentsBuilder uriComponentsBuilder){
-        Cliente cliente = clienteRepository.save(new Cliente(datosCliente));
+    public ResponseEntity<DatosCliente> registrarCliente(@Valid @RequestBody DatosCliente datosCliente, UriComponentsBuilder uriComponentsBuilder) {
+        Cliente cliente = clienteService.save(new Cliente(datosCliente));
         DatosCliente nuevoCliente = new DatosCliente(cliente);
         URI url = uriComponentsBuilder.path("/cliente/{id}").buildAndExpand(cliente.getId()).toUri();
         return ResponseEntity.created(url).body(nuevoCliente);
@@ -43,28 +43,31 @@ public class ClienteController {
 
     @PutMapping
     @Transactional
-    public ResponseEntity actualizarCliente(@RequestBody DatosCliente datosCliente){
-        Cliente cliente = clienteRepository.getReferenceById(datosCliente.id());
-        cliente.actualizarDatosCliente(datosCliente);
+    public ResponseEntity<DatosCliente> actualizarCliente(@Valid @RequestBody DatosCliente datosCliente) {
+        Cliente cliente = clienteService.update(datosCliente);
         return ResponseEntity.ok(new DatosCliente(cliente));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity eliminarCliente(@PathVariable Long id){
-        if (clienteRepository.getReferenceById(id) != null && clienteRepository.existsById(id)){
-            Cliente cliente = clienteRepository.getReferenceById(id);
-            cliente.eliminarCliente(cliente);
+    public ResponseEntity<Void> eliminarCliente(@PathVariable Long id) {
+        boolean isDeleted = clienteService.delete(id);
+        if (isDeleted) {
             return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DatosCliente> buscarClientePorId(@PathVariable Long id){
-        Cliente cliente = clienteRepository.getReferenceById(id);
-        var datosCliente = new DatosCliente(cliente);
-        return ResponseEntity.ok(datosCliente);
+    public ResponseEntity<DatosCliente> buscarClientePorId(@PathVariable Long id) {
+        Cliente cliente = clienteService.findById(id);
+        if (cliente != null) {
+            var datosCliente = new DatosCliente(cliente);
+            return ResponseEntity.ok(datosCliente);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

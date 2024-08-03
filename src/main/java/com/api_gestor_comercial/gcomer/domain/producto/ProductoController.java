@@ -18,53 +18,56 @@ import java.net.URI;
 @RequestMapping("/producto")
 public class ProductoController {
 
-    private ProductoRepository productoRepository;
+    private ProductoService productoService;
 
-    public ProductoController(ProductoRepository productoRepository){
-        this.productoRepository = productoRepository;
+    public ProductoController(ProductoService productoService){
+        this.productoService = productoService;
     }
 
     @GetMapping
-    public ResponseEntity<Page<Producto>> listarProductos(@PageableDefault(size = 5)Pageable pageable){
-        Pageable sortedByDateDesc = PageRequest.of(
+    public ResponseEntity<Page<Producto>> listarProductos(@PageableDefault(size = 5) Pageable pageable) {
+        Pageable sortedByIdDesc = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "id")
         );
-        return ResponseEntity.ok(productoRepository.findAll(sortedByDateDesc));
+        return ResponseEntity.ok(productoService.findAll(sortedByIdDesc));
     }
 
     @PostMapping
-    public ResponseEntity<DatosProducto> registrarProducto(@Valid@RequestBody DatosProducto datosProducto, UriComponentsBuilder uriComponentsBuilder){
-        Producto producto = productoRepository.save(new Producto(datosProducto));
+    public ResponseEntity<DatosProducto> registrarProducto(@Valid @RequestBody DatosProducto datosProducto, UriComponentsBuilder uriComponentsBuilder) {
+        Producto producto = productoService.save(new Producto(datosProducto));
         DatosProducto nuevoProducto = new DatosProducto(producto);
-        URI url = uriComponentsBuilder.path("/producto{id}").buildAndExpand(producto.getId()).toUri();
+        URI url = uriComponentsBuilder.path("/producto/{id}").buildAndExpand(producto.getId()).toUri();
         return ResponseEntity.created(url).body(nuevoProducto);
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity actualizarProducto(@Valid @RequestBody DatosProducto datosProducto){
-        Producto producto = productoRepository.getReferenceById(datosProducto.id());
-        producto.actualizarDatosProducto(datosProducto);
+    public ResponseEntity<DatosProducto> actualizarProducto(@Valid @RequestBody DatosProducto datosProducto) {
+        Producto producto = productoService.update(datosProducto);
         return ResponseEntity.ok(new DatosProducto(producto));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity eliminarProducto(@PathVariable Long id){
-        if (productoRepository.getReferenceById(id) != null && productoRepository.existsById(id)){
-            Producto producto = productoRepository.getReferenceById(id);
-            productoRepository.deleteById(id);
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+        boolean isDeleted = productoService.delete(id);
+        if (isDeleted) {
             return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DatosProducto> buscarProductoPorID(@Valid @PathVariable Long id){
-        Producto producto = productoRepository.getReferenceById(id);
-        var datosProducto = new DatosProducto(producto);
-        return ResponseEntity.ok(datosProducto);
+    public ResponseEntity<DatosProducto> buscarProductoPorID(@PathVariable Long id) {
+        Producto producto = productoService.findById(id);
+        if (producto != null) {
+            var datosProducto = new DatosProducto(producto);
+            return ResponseEntity.ok(datosProducto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
