@@ -28,7 +28,7 @@ public class PedidoController {
         Pageable sortedByIdDesc = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "id")
+                Sort.by(Sort.Direction.DESC, "fechaDePedido")
         );
         return ResponseEntity.ok(pedidoService.findAll(sortedByIdDesc));
     }
@@ -38,7 +38,7 @@ public class PedidoController {
         Pageable sortedByIdDesc = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "id")
+                Sort.by(Sort.Direction.DESC, "fechaDePedido")
         );
         return ResponseEntity.ok(pedidoService.findByEnviadoFalse(sortedByIdDesc));
     }
@@ -48,7 +48,7 @@ public class PedidoController {
         Pageable sortedByIdDesc = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "id")
+                Sort.by(Sort.Direction.DESC, "fechaDePedido")
         );
         return ResponseEntity.ok(pedidoService.findByEnviadoTrue(sortedByIdDesc));
     }

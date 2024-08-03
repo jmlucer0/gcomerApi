@@ -24,7 +24,7 @@ public class Pedido {
     private boolean enviado;
     @ManyToOne
     private Cliente cliente;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
             name = "pedido_producto",
             joinColumns = @JoinColumn(name = "pedido_id"),

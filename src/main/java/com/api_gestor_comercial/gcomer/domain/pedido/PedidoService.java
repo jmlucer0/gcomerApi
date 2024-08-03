@@ -20,11 +20,11 @@ public class PedidoService {
     }
 
     public Page<Pedido> findByEnviadoTrue(Pageable pageable){
-        return pedidoRepository.findByEnviadoTrue();
+        return pedidoRepository.findByEnviadoTrue(pageable);
     }
 
     public Page<Pedido> findByEnviadoFalse(Pageable pageable){
-        return pedidoRepository.findByEnviadoFalse();
+        return pedidoRepository.findByEnviadoFalse(pageable);
     }
 
     public Pedido save(Pedido pedido) {
