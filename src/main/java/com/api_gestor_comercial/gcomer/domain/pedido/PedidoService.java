@@ -6,6 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
+
 @Service
 public class PedidoService {
 
@@ -19,12 +22,34 @@ public class PedidoService {
         return pedidoRepository.findAll(pageable);
     }
 
+    public Page<Pedido> findByEnviadoFalse(Pageable pageable){
+        return pedidoRepository.findByEnviadoFalse(pageable);
+    }
+
     public Page<Pedido> findByEnviadoTrue(Pageable pageable){
         return pedidoRepository.findByEnviadoTrue(pageable);
     }
 
-    public Page<Pedido> findByEnviadoFalse(Pageable pageable){
-        return pedidoRepository.findByEnviadoFalse(pageable);
+    public Page<Pedido> findByEnviadoDia(Pageable pageable){
+        LocalDate today = LocalDate.now();
+        return pedidoRepository.findByEnviadoTrueAndFechaDePedido(today, pageable);
+    }
+    public Page<Pedido> findByNoEnviadoDia(Pageable pageable){
+        LocalDate today = LocalDate.now();
+        return pedidoRepository.findByEnviadoFalseAndFechaDePedido(today, pageable);
+    }
+
+    public Page<Pedido> findEnviadosByMonth(int year, int month, Pageable pageable) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+        return pedidoRepository.findByEnviadoTrueAndFechaDePedidoBetween(startDate, endDate, pageable);
+    }
+
+    public Page<Pedido> findEnviadosByYear(int year, Pageable pageable) {
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+        return pedidoRepository.findByEnviadoTrueAndFechaDePedidoBetween(startDate, endDate, pageable);
     }
 
     public Pedido save(Pedido pedido) {

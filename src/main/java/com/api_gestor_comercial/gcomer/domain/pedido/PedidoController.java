@@ -40,7 +40,7 @@ public class PedidoController {
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "fechaDePedido")
         );
-        return ResponseEntity.ok(pedidoService.findByEnviadoFalse(sortedByIdDesc));
+        return ResponseEntity.ok(pedidoService.findByNoEnviadoDia(sortedByIdDesc));
     }
 
     @GetMapping("/enviados")
@@ -50,7 +50,31 @@ public class PedidoController {
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "fechaDePedido")
         );
-        return ResponseEntity.ok(pedidoService.findByEnviadoTrue(sortedByIdDesc));
+        return ResponseEntity.ok(pedidoService.findByEnviadoDia(sortedByIdDesc));
+    }
+
+    @GetMapping("/enviados?{month}-{year}")
+    public ResponseEntity<Page<Pedido>> listarPedidosEnviadosByMes(
+            @PathVariable int year,
+            @PathVariable int month,
+            @PageableDefault(size = 8) Pageable pageable){
+        Pageable sortedByIdDesc = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "fechaDePedido")
+        );
+        return ResponseEntity.ok(pedidoService.findEnviadosByMonth(year, month, sortedByIdDesc));
+    }
+    @GetMapping("/enviados?{year}")
+    public ResponseEntity<Page<Pedido>> listarPedidosEnviadosByYear(
+            @PathVariable int year,
+            @PageableDefault(size = 8) Pageable pageable){
+        Pageable sortedByIdDesc = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "fechaDePedido")
+        );
+        return ResponseEntity.ok(pedidoService.findEnviadosByYear(year, sortedByIdDesc));
     }
 
 
