@@ -34,7 +34,7 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<DatosCliente> registrarCliente (@Valid @RequestBody  DatosCliente datosCliente, UriComponentsBuilder uriComponentsBuilder){
+    public ResponseEntity<DatosCliente> registrarCliente (@RequestBody  DatosCliente datosCliente, UriComponentsBuilder uriComponentsBuilder){
         Cliente cliente = clienteRepository.save(new Cliente(datosCliente));
         DatosCliente nuevoCliente = new DatosCliente(cliente);
         URI url = uriComponentsBuilder.path("/cliente/{id}").buildAndExpand(cliente.getId()).toUri();

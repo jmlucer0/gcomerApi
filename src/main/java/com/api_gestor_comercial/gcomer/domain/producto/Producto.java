@@ -21,4 +21,17 @@ public class Producto {
     private double precio;
 
 
+    public Producto(DatosProducto datosProducto) {
+        this.nombre = datosProducto.nombre();
+        this.precio = datosProducto.precio();
+    }
+
+    public void actualizarDatosProducto(DatosProducto datosProducto) {
+        if(datosProducto.nombre() != null){
+            this.nombre = datosProducto.nombre();
+        }
+        if(datosProducto.precio() == -1){
+            this.precio = datosProducto.precio();
+        }
+    }
 }
