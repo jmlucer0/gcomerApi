@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     Page<Cliente> findByActivoTrue(Pageable pageable);
+
+    Page<Cliente> findByNombreContaining(String nombre, Pageable pageable);
 }

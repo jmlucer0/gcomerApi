@@ -72,5 +72,10 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/nombre")
+    public ResponseEntity<Page<DatosCliente>> buscarClientePorNombre(@RequestParam String nombre, Pageable pageable) {
+        Page<DatosCliente> cliente = clienteService.findByNombre(pageable, nombre);
+        return ResponseEntity.ok(cliente);
+    }
 
 }

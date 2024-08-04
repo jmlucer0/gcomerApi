@@ -23,6 +23,15 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    public Page<DatosCliente> findByNombre(Pageable pageable, String nombre){
+        if (nombre != null && !nombre.isEmpty()) {
+            Page<Cliente> clientes = clienteRepository.findByNombreContaining(nombre, pageable);
+            return clientes.map(DatosCliente::new);
+        } else {
+            return Page.empty(pageable);
+        }
+    }
+
     @Transactional
     public Cliente update(DatosCliente datosCliente) {
         Cliente cliente = clienteRepository.findById(datosCliente.id())
