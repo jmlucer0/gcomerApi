@@ -3,13 +3,14 @@ package com.api_gestor_comercial.gcomer.domain.pedido;
 import com.api_gestor_comercial.gcomer.domain.cliente.Cliente;
 import com.api_gestor_comercial.gcomer.domain.producto.Producto;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -22,51 +23,24 @@ public class Pedido {
     private Long id;
     private LocalDate fechaDePedido;
     private boolean enviado;
+
     @ManyToOne
     private Cliente cliente;
-    @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(
-            name = "pedido_producto",
-            joinColumns = @JoinColumn(name = "pedido_id"),
-            inverseJoinColumns = @JoinColumn(name = "producto_id")
-    )
-    private List<Producto> listaDeProductos;
+
+    @ElementCollection
+    @CollectionTable(name = "pedido_producto", joinColumns = @JoinColumn(name = "pedido_id"))
+    @MapKeyJoinColumn(name = "producto_id")
+    @Column(name = "cantidad")
+    private Map<Producto, Integer> productos = new HashMap<>();
     private double precioTotal;
 
     public Pedido(DatosPedido datosPedido) {
-        this.fechaDePedido = LocalDate.now();
-        this.listaDeProductos = datosPedido.listaDeProductos();
-        this.cliente = datosPedido.cliente();
-        this.enviado = false;
-        this.precioTotal = sumaPrecioListaProductos(datosPedido.listaDeProductos());
     }
 
-    private double sumaPrecioListaProductos(List<Producto> listaDeProductos){
-        double precioTotal = listaDeProductos.stream().mapToDouble(Producto::getPrecio)
+    public double calculaPrecioTotal(Map<Producto, Integer> productos) {
+        return productos.entrySet().stream()
+                .mapToDouble(entry -> entry.getKey().getPrecio() * entry.getValue())
                 .sum();
-        return precioTotal;
-    }
+  }
 
-    public Pedido(Long id, LocalDate fechaDePedido, Cliente cliente, List<Producto> listaDeProductos, double precioTotal) {
-        this.id = id;
-        this.fechaDePedido = LocalDate.now();
-        this.enviado = false;
-        this.cliente = cliente;
-        this.listaDeProductos = listaDeProductos;
-        this.precioTotal = sumaPrecioListaProductos(listaDeProductos);
-    }
-
-    public void actualizarPedido(DatosActualizarPedido datosActualizarPedido) {
-        if(datosActualizarPedido.enviado()){
-            this.enviado = datosActualizarPedido.enviado();
-        }
-        if(datosActualizarPedido.cliente() !=null){
-            this.cliente = datosActualizarPedido.cliente();
-        }
-        if(datosActualizarPedido.listaDeProductos() != null){
-            this.listaDeProductos = datosActualizarPedido.listaDeProductos();
-            this.precioTotal = sumaPrecioListaProductos(listaDeProductos);
-        }
-
-    }
 }

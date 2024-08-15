@@ -30,7 +30,7 @@ public class Producto {
         if(datosProducto.nombre() != null){
             this.nombre = datosProducto.nombre();
         }
-        if(datosProducto.precio() == -1){
+        if(datosProducto.precio() != -1){
             this.precio = datosProducto.precio();
         }
     }

@@ -1,5 +1,9 @@
 package com.api_gestor_comercial.gcomer.domain.pedido;
 
+import com.api_gestor_comercial.gcomer.domain.cliente.Cliente;
+import com.api_gestor_comercial.gcomer.domain.cliente.ClienteRepository;
+import com.api_gestor_comercial.gcomer.domain.producto.Producto;
+import com.api_gestor_comercial.gcomer.domain.producto.ProductoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -8,14 +12,24 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
 
     private PedidoRepository pedidoRepository;
+    private final ClienteRepository clienteRepository;
+    private ProductoRepository productoRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository){
+
+    public PedidoService(PedidoRepository pedidoRepository, ProductoRepository
+            productoRepository, ClienteRepository clienteRepository) {
         this.pedidoRepository = pedidoRepository;
+        this.productoRepository = productoRepository;
+        this.clienteRepository = clienteRepository;
+
     }
 
     public Page<Pedido> findAll(Pageable pageable) {
@@ -77,5 +91,65 @@ public class PedidoService {
     public Pedido findById(Long id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
+    }
+
+    public double calculaPrecioTotal(Map<Producto, Integer> productos) {
+        return productos.entrySet().stream()
+                .mapToDouble(entry -> entry.getKey().getPrecio() * entry.getValue())
+                .sum();
+    }
+
+    public Pedido actualizarPedido(Long pedidoId, DatosActualizarPedido datosActualizarPedido) {
+    Pedido pedido = pedidoRepository.findById(pedidoId)
+            .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
+
+    // Actualizar cliente si es necesario
+    if (datosActualizarPedido.cliente() != null) {
+        Cliente nuevoCliente = clienteRepository.findById(datosActualizarPedido.cliente().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
+        pedido.setCliente(nuevoCliente);
+    }
+
+    // Actualizar productos si es necesario
+    if (datosActualizarPedido.productos() != null) {
+        // Crear un nuevo Map para evitar modificar el original directamente
+        Map<Producto, Integer> nuevosProductos = new HashMap<>();
+
+        // Iterar sobre los productos del DTO y actualizar o agregar
+        for (Map.Entry<Producto, Integer> entry : datosActualizarPedido.productos().entrySet()) {
+            Producto producto = productoRepository.findById(entry.getKey().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
+            nuevosProductos.put(producto, entry.getValue());
+        }
+
+        // Reemplazar el Map de productos del pedido
+        pedido.setProductos(nuevosProductos);
+    }
+
+    // Recalcular el precio total
+    pedido.setPrecioTotal(calculaPrecioTotal(pedido.getProductos()));
+
+    // Persistir los cambios
+    return pedidoRepository.save(pedido);
+}
+
+    public Pedido crearPedido(DatosPedido datosPedido) {
+        Pedido nuevoPedido = new Pedido();
+        nuevoPedido.setFechaDePedido(LocalDate.now());
+
+        Cliente cliente = clienteRepository.findById(datosPedido.cliente().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
+        nuevoPedido.setCliente(cliente);
+
+        // Crear un Map de productos a partir de los IDs y cantidades
+        Map<Producto, Integer> productos = datosPedido.productos()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        entry -> productoRepository.findById(entry.getKey().getId()).orElseThrow(() -> new EntityNotFoundException("Producto no encontrado")),
+                        Map.Entry::getValue
+                ));
+        nuevoPedido.setProductos(productos);
+        return pedidoRepository.save(nuevoPedido);
     }
 }
