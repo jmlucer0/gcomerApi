@@ -18,11 +18,14 @@ public record DatosPedido(
         this(
                 pedido.getId(),
                 pedido.getFechaDePedido(),
-                pedido.getCliente().getId(),
+                pedido.getCliente(),
                 pedido.getProductos().entrySet().stream()
                         .collect(Collectors.toMap(
-
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
                         ))
         );
     }
+
+
 }

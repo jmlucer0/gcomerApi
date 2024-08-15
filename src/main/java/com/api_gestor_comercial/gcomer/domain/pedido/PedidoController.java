@@ -89,7 +89,7 @@ public class PedidoController {
     @PutMapping
     @Transactional
     public ResponseEntity actualizarPedido(@Valid @RequestBody DatosActualizarPedido datosActualizarPedido){
-        Pedido pedido = pedidoService.update(datosActualizarPedido);
+        Pedido pedido = pedidoService.pedidoUpdate(datosActualizarPedido);
         return ResponseEntity.ok(new DatosActualizarPedido(pedido));
     }
 
