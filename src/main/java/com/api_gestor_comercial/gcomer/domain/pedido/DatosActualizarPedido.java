@@ -11,17 +11,21 @@ public record DatosActualizarPedido(
         Long id,
         LocalDate fechaDePedido,
         Cliente cliente,
+        boolean enviado,
         Map<Producto, Integer> productos
 
 ) {
     public DatosActualizarPedido(Pedido pedido) {
-        this(
-                pedido.getId(),
+        this(pedido.getId(),
                 pedido.getFechaDePedido(),
-                pedido.getCliente().getId(),
-                pedido.getProductos().entrySet().stream()
-                        .collect(Collectors.toMap(
-                                e -> e.
-        );
-            }
+                pedido.getCliente(),
+                pedido.isEnviado(),
+                pedido.getProductos().entrySet().stream().collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ))
+                );
+
+    }
+
 }
