@@ -70,14 +70,6 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
-//    @Transactional
-//    public Pedido update(DatosActualizarPedido datosActualizarPedido) {
-//        Pedido pedido = pedidoRepository.findById(datosActualizarPedido.id())
-//                .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
-//        pedido.actualizarPedido(datosActualizarPedido);
-//        return pedido;
-//    }
-
     @Transactional
     public boolean delete(Long id) {
         if (pedidoRepository.existsById(id)) {
