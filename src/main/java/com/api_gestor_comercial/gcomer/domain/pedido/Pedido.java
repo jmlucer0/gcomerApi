@@ -20,7 +20,7 @@ public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate fechaDePedido;
+    private LocalDate fechaDePedido = LocalDate.now();
     private boolean enviado = false;
 
     @ManyToOne
@@ -36,26 +36,4 @@ public class Pedido {
     public Pedido(DatosPedido datosPedido) {
     }
 
-//    public double calculaPrecioTotal(Map<Producto, Integer> productos) {
-//        return productos.entrySet().stream()
-//                .mapToDouble(entry -> entry.getKey().getPrecio() * entry.getValue())
-//                .sum();
-//  }
-//
-//    public void actualizarPedido(DatosActualizarPedido datosActualizarPedido) {
-//        if (datosActualizarPedido != null){
-//            if (datosActualizarPedido.cliente() != null){
-//                this.cliente = datosActualizarPedido.cliente();
-//            }
-//
-//            if (!datosActualizarPedido.productos().isEmpty()){
-//                this.productos = datosActualizarPedido.productos();
-//            }
-//
-//            if (datosActualizarPedido.enviado() != false){
-//                this.enviado = true;
-//            }
-//
-//        }
-//    }
 }
