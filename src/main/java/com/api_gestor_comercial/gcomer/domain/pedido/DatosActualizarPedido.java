@@ -1,31 +1,25 @@
 package com.api_gestor_comercial.gcomer.domain.pedido;
 
-import com.api_gestor_comercial.gcomer.domain.cliente.Cliente;
-import com.api_gestor_comercial.gcomer.domain.producto.Producto;
-
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public record DatosActualizarPedido(
+public record DatosActualizarPedido (
         Long id,
-        LocalDate fechaDePedido,
-        Cliente cliente,
+        Long clienteId,
         boolean enviado,
-        Map<Producto, Integer> productos
-
+        Map<Long, Integer> productos
 ) {
-    public DatosActualizarPedido(Pedido pedido) {
-        this(pedido.getId(),
-                pedido.getFechaDePedido(),
-                pedido.getCliente(),
-                pedido.isEnviado(),
-                pedido.getProductos().entrySet().stream().collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue
-                ))
+
+    public DatosActualizarPedido(ActualizarPedidoDTO actualizarPedidoDTO) {
+        this(
+                actualizarPedidoDTO.id(),
+                actualizarPedidoDTO.cliente().getId(),
+                actualizarPedidoDTO.enviado(),
+                actualizarPedidoDTO.productos().entrySet().stream()
+                        .collect(Collectors.toMap(
+                                entry -> entry.getKey().getId(),
+                                Map.Entry::getValue
+                        ))
                 );
-
     }
-
 }
