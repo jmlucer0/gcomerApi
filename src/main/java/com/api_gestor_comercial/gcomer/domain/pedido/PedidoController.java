@@ -77,10 +77,9 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.findEnviadosByYear(year, sortedByIdDesc));
     }
 
-
     @PostMapping
-    public ResponseEntity<DatosPedido> registrarPedido(@RequestBody DatosPedido datosPedido, UriComponentsBuilder uriComponentsBuilder){
-        Pedido pedido = pedidoService.save(new Pedido(datosPedido));
+    public ResponseEntity<DatosPedido> registrarPedido(@RequestBody CrearPedido datosPedido, UriComponentsBuilder uriComponentsBuilder){
+        Pedido pedido = pedidoService.crearPedido(datosPedido);
         DatosPedido nuevoPedido = new DatosPedido(pedido);
         URI url = uriComponentsBuilder.path("/pedido{id}").buildAndExpand(pedido.getId()).toUri();
         return ResponseEntity.created(url).body(nuevoPedido);
@@ -90,7 +89,7 @@ public class PedidoController {
     @Transactional
     public ResponseEntity actualizarPedido(@Valid @RequestBody DatosActualizarPedido datosActualizarPedido){
         Pedido pedido = pedidoService.pedidoUpdate(datosActualizarPedido);
-        return ResponseEntity.ok(new DatosActualizarPedido(pedido));
+        return ResponseEntity.ok(new ActualizarPedidoDTO(pedido));
     }
 
     @DeleteMapping("/{id}")
@@ -114,6 +113,7 @@ public class PedidoController {
             return ResponseEntity.notFound().build();
         }
     }
+
 
 
 }

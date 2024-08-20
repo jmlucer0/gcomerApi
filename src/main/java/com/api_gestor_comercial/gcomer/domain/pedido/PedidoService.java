@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -85,64 +84,59 @@ public class PedidoService {
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
     }
 
-    public double calculaPrecioTotal(Map<Producto, Integer> productos) {
-        return productos.entrySet().stream()
-                .mapToDouble(entry -> entry.getKey().getPrecio() * entry.getValue())
-                .sum();
-    }
-
     @Transactional
     public Pedido pedidoUpdate(DatosActualizarPedido datosActualizarPedido) {
     Pedido pedido = pedidoRepository.findById(datosActualizarPedido.id())
             .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
 
-    // Actualizar cliente si es necesario
-    if (datosActualizarPedido.cliente() != null) {
-        Cliente nuevoCliente = clienteRepository.findById(datosActualizarPedido.cliente().getId())
+    if (datosActualizarPedido.clienteId() != null) {
+        Cliente nuevoCliente = clienteRepository.findById(datosActualizarPedido.clienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
         pedido.setCliente(nuevoCliente);
     }
 
-    // Actualizar productos si es necesario
     if (datosActualizarPedido.productos() != null) {
-        // Crear un nuevo Map para evitar modificar el original directamente
-        Map<Producto, Integer> nuevosProductos = new HashMap<>();
 
-        // Iterar sobre los productos del DTO y actualizar o agregar
-        for (Map.Entry<Producto, Integer> entry : datosActualizarPedido.productos().entrySet()) {
-            Producto producto = productoRepository.findById(entry.getKey().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
+        Map<Producto, Integer> nuevosProductos = new HashMap<>();
+        double precioTotal = 0;
+        for (Map.Entry<Long, Integer> entry : datosActualizarPedido.productos().entrySet()) {
+            Producto producto = productoRepository.findById(entry.getKey())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + entry.getKey()));
             nuevosProductos.put(producto, entry.getValue());
+            precioTotal += producto.getPrecio() * entry.getValue();
         }
 
-        // Reemplazar el Map de productos del pedido
         pedido.setProductos(nuevosProductos);
+        pedido.setPrecioTotal(precioTotal);
     }
 
-    // Recalcular el precio total
-    pedido.setPrecioTotal(calculaPrecioTotal(pedido.getProductos()));
+    if(datosActualizarPedido.enviado()){
+        pedido.setEnviado(true);
+    }
 
-    // Persistir los cambios
     return pedidoRepository.save(pedido);
 }
 
-    public Pedido crearPedido(DatosPedido datosPedido) {
-        Pedido nuevoPedido = new Pedido();
-        nuevoPedido.setFechaDePedido(LocalDate.now());
+    @Transactional
+    public Pedido crearPedido(CrearPedido crearPedido) {
+        Cliente cliente = clienteRepository.findById(crearPedido.clienteId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        Cliente cliente = clienteRepository.findById(datosPedido.cliente().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
-        nuevoPedido.setCliente(cliente);
+        Map<Producto, Integer> productosMap = new HashMap<>();
+        double precioTotal = 0;
 
-        // Crear un Map de productos a partir de los IDs y cantidades
-        Map<Producto, Integer> productos = datosPedido.productos()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        entry -> productoRepository.findById(entry.getKey().getId()).orElseThrow(() -> new EntityNotFoundException("Producto no encontrado")),
-                        Map.Entry::getValue
-                ));
-        nuevoPedido.setProductos(productos);
-        return pedidoRepository.save(nuevoPedido);
+        for (Map.Entry<Long, Integer> entry : crearPedido.productos().entrySet()) {
+            Producto producto = productoRepository.findById(entry.getKey())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + entry.getKey()));
+            productosMap.put(producto, entry.getValue());
+            precioTotal += producto.getPrecio() * entry.getValue();
+        }
+
+        Pedido pedido = new Pedido();
+        pedido.setCliente(cliente);
+        pedido.setProductos(productosMap);
+        pedido.setPrecioTotal(precioTotal);
+
+        return pedidoRepository.save(pedido);
     }
 }
