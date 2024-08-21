@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/pedido")
@@ -30,7 +31,7 @@ public class PedidoController {
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "fechaDePedido")
         );
-        return ResponseEntity.ok(pedidoService.findAll(sortedByIdDesc));
+        return ResponseEntity.ok(pedidoService.findAllByDay(sortedByIdDesc));
     }
 
     @GetMapping("/no-enviados")
@@ -113,7 +114,5 @@ public class PedidoController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 
 }

@@ -31,16 +31,9 @@ public class PedidoService {
 
     }
 
-    public Page<Pedido> findAll(Pageable pageable) {
-        return pedidoRepository.findAll(pageable);
-    }
-
-    public Page<Pedido> findByEnviadoFalse(Pageable pageable){
-        return pedidoRepository.findByEnviadoFalse(pageable);
-    }
-
-    public Page<Pedido> findByEnviadoTrue(Pageable pageable){
-        return pedidoRepository.findByEnviadoTrue(pageable);
+    public Page<Pedido> findAllByDay(Pageable pageable) {
+        LocalDate today = LocalDate.now();
+        return pedidoRepository.findAllByFechaDePedido(today, pageable);
     }
 
     public Page<Pedido> findByEnviadoDia(Pageable pageable){
@@ -63,10 +56,6 @@ public class PedidoService {
         LocalDate startDate = LocalDate.of(year, 1, 1);
         LocalDate endDate = LocalDate.of(year, 12, 31);
         return pedidoRepository.findByEnviadoTrueAndFechaDePedidoBetween(startDate, endDate, pageable);
-    }
-
-    public Pedido save(Pedido pedido) {
-        return pedidoRepository.save(pedido);
     }
 
     @Transactional
