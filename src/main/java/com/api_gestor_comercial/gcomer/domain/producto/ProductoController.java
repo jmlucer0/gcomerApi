@@ -1,7 +1,7 @@
 package com.api_gestor_comercial.gcomer.domain.producto;
 
-import com.api_gestor_comercial.gcomer.domain.cliente.DatosCliente;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +18,9 @@ import java.net.URI;
 @RequestMapping("/producto")
 public class ProductoController {
 
-    private ProductoService productoService;
+    private final ProductoService productoService;
 
+    @Autowired
     public ProductoController(ProductoService productoService){
         this.productoService = productoService;
     }

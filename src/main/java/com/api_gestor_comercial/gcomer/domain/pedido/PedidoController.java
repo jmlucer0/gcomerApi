@@ -1,6 +1,7 @@
 package com.api_gestor_comercial.gcomer.domain.pedido;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +18,9 @@ import java.net.URI;
 @RequestMapping("/pedido")
 public class PedidoController {
 
-    private PedidoService pedidoService;
+    private final PedidoService pedidoService;
 
+    @Autowired
     public PedidoController(PedidoService pedidoService){
         this.pedidoService = pedidoService;
     }

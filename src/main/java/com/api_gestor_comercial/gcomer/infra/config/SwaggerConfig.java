@@ -1,10 +1,11 @@
-package com.api_gestor_comercial.gcomer.infra.config.swagger;
+package com.api_gestor_comercial.gcomer.infra.config;
 
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Configuration;
 
-
+@OpenAPIDefinition
 @Configuration
 public class SwaggerConfig {
     public OpenApiCustomizer openApiCustomiser() {

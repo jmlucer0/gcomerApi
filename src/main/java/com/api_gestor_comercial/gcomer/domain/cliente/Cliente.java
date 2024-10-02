@@ -26,26 +26,9 @@ public class Cliente {
     @Pattern(regexp = "\\d{6,10}")
     private String telefono;
     private String direccion;
-    private boolean activo;
+    private boolean activo = true;
 
     public Cliente(DatosCliente datosCliente) {
-        this.nombre = datosCliente.nombre();
-        this.telefono = datosCliente.telefono();
-        this.direccion = datosCliente.direccion();
-        this.activo = true;
-    }
-
-
-    public void actualizarDatosCliente(DatosCliente datosCliente) {
-        if(datosCliente.nombre() != null){
-            this.nombre = datosCliente.nombre();
-        }
-        if(datosCliente.telefono()!=null){
-            this.telefono = datosCliente.telefono();
-        }
-        if(datosCliente.direccion() != null){
-            this.direccion = datosCliente.direccion();
-        }
     }
 
     public void eliminarCliente(Cliente cliente) {
