@@ -2,6 +2,7 @@ package com.api_gestor_comercial.gcomer.domain.cliente;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,8 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClienteService {
 
-    private ClienteRepository  clienteRepository;
+    private final ClienteRepository  clienteRepository;
 
+    @Autowired
     public ClienteService(ClienteRepository clienteRepository){
         this.clienteRepository = clienteRepository;
     }
@@ -19,8 +21,15 @@ public class ClienteService {
         return clienteRepository.findByActivoTrue(pageable);
     }
 
-    public Cliente save(Cliente cliente) {
-        return clienteRepository.save(cliente);
+    public Cliente save(DatosCliente cliente) {
+        Cliente nuevoCliente = new Cliente(cliente);
+        if (cliente != null){
+            nuevoCliente.setNombre(cliente.nombre());
+            nuevoCliente.setTelefono(cliente.telefono());
+            nuevoCliente.setDireccion(cliente.direccion());
+        }
+        clienteRepository.save(nuevoCliente);
+        return nuevoCliente;
     }
 
     public Page<DatosCliente> findByNombre(Pageable pageable, String nombre){
@@ -36,7 +45,15 @@ public class ClienteService {
     public Cliente update(DatosCliente datosCliente) {
         Cliente cliente = clienteRepository.findById(datosCliente.id())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
-        cliente.actualizarDatosCliente(datosCliente);
+        if(datosCliente.nombre() !=null){
+            cliente.setNombre(datosCliente.nombre());
+        }
+        if (datosCliente.direccion() != null){
+            cliente.setDireccion(datosCliente.direccion());
+        }
+        if (datosCliente.telefono() != null){
+            cliente.setTelefono(datosCliente.telefono());
+        }
         return cliente;
     }
 

@@ -6,6 +6,7 @@ import com.api_gestor_comercial.gcomer.domain.producto.Producto;
 import com.api_gestor_comercial.gcomer.domain.producto.ProductoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,12 @@ import java.util.Map;
 @Service
 public class PedidoService {
 
-    private PedidoRepository pedidoRepository;
+    private final PedidoRepository pedidoRepository;
     private final ClienteRepository clienteRepository;
-    private ProductoRepository productoRepository;
+    private final ProductoRepository productoRepository;
 
 
+    @Autowired
     public PedidoService(PedidoRepository pedidoRepository, ProductoRepository
             productoRepository, ClienteRepository clienteRepository) {
         this.pedidoRepository = pedidoRepository;

@@ -3,6 +3,7 @@ package com.api_gestor_comercial.gcomer.domain.cliente;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +20,9 @@ import java.net.URI;
 @RequestMapping("/cliente")
 public class ClienteController {
 
-    private ClienteService clienteService;
+    private final ClienteService clienteService;
 
+    @Autowired
     public ClienteController(ClienteService clienteService){
         this.clienteService = clienteService;
     }
@@ -37,7 +39,7 @@ public class ClienteController {
 
     @PostMapping
     public ResponseEntity<DatosCliente> registrarCliente(@Valid @RequestBody DatosCliente datosCliente, UriComponentsBuilder uriComponentsBuilder) {
-        Cliente cliente = clienteService.save(new Cliente(datosCliente));
+        Cliente cliente = clienteService.save(datosCliente);
         DatosCliente nuevoCliente = new DatosCliente(cliente);
         URI url = uriComponentsBuilder.path("/cliente/{id}").buildAndExpand(cliente.getId()).toUri();
         return ResponseEntity.created(url).body(nuevoCliente);
@@ -72,6 +74,7 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/nombre")
     public ResponseEntity<Page<DatosCliente>> buscarClientePorNombre(@RequestParam String nombre, Pageable pageable) {
         Page<DatosCliente> cliente = clienteService.findByNombre(pageable, nombre);
