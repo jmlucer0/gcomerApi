@@ -20,4 +20,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     Page<Pedido> findByEnviadoTrueAndFechaDePedidoBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     Page<Pedido> findAllByFechaDePedido(LocalDate today, Pageable pageable);
+
+    Page<Pedido> findByFormaDePagoAndFechaDePedido(String formaDePago, LocalDate localDate, Pageable pageable);
 }

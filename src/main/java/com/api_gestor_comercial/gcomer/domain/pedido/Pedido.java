@@ -2,6 +2,7 @@ package com.api_gestor_comercial.gcomer.domain.pedido;
 
 import com.api_gestor_comercial.gcomer.domain.cliente.Cliente;
 import com.api_gestor_comercial.gcomer.domain.producto.Producto;
+import com.api_gestor_comercial.gcomer.domain.venta.FormaDePago;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class Pedido {
     @Column(name = "cantidad")
     private Map<Producto, Integer> productos = new HashMap<>();
     private double precioTotal;
+    private FormaDePago formaDePago;
 
     public Pedido(DatosPedido datosPedido) {
     }

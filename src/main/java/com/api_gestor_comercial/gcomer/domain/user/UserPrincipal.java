@@ -21,7 +21,7 @@ public class UserPrincipal implements UserDetails {
         if (role == null) {
             throw new IllegalArgumentException("User role is not set.");
         }
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override

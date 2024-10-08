@@ -1,8 +1,10 @@
 package com.api_gestor_comercial.gcomer.infra.security.auth;
 
+import com.api_gestor_comercial.gcomer.domain.user.Role;
 import com.api_gestor_comercial.gcomer.domain.user.User;
 import com.api_gestor_comercial.gcomer.domain.user.UserPrincipal;
 import com.api_gestor_comercial.gcomer.domain.user.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -38,4 +40,17 @@ public class CustomUserDetailService implements UserDetailsService {
        return newUser;
     }
 
+    @Transactional
+    public boolean deleteUser(Long id){
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        if (user.getRole() != Role.ADMIN) {
+            userRepository.deleteById(id);
+            System.out.println(userRepository.findById(id).toString());
+            return true;
+        } else {
+            System.out.println("Usuarios con el Rol 'ADMIN' no pueden ser eliminados");
+            return false;
+        }
+    }
 }

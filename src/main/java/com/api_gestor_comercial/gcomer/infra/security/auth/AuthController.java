@@ -3,9 +3,11 @@ package com.api_gestor_comercial.gcomer.infra.security.auth;
 import com.api_gestor_comercial.gcomer.domain.user.User;
 import com.api_gestor_comercial.gcomer.domain.user.UserRepository;
 import com.api_gestor_comercial.gcomer.infra.security.jwt.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -70,5 +72,17 @@ public class AuthController {
         String jwt = jwtUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtResponse(jwt));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/delete/{id}")
+    @Transactional
+    public ResponseEntity deleteUser(@PathVariable Long id){
+        boolean isDeleted = userDetailsService.deleteUser(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

@@ -79,6 +79,17 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.findEnviadosByYear(year, sortedByIdDesc));
     }
 
+    @GetMapping("/pago?{formaDePago}")
+    public ResponseEntity<Page<Pedido>> listarPedidosPorFormaDePago(@PathVariable String formaDePago, @PageableDefault(size = 8) Pageable pageable){
+        Pageable sortedByIdDesc = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "fechaDePedido")
+        );
+
+        return ResponseEntity.ok(pedidoService.findByFormaDePagoByDay(formaDePago, sortedByIdDesc));
+    }
+
     @PostMapping
     public ResponseEntity<DatosPedido> registrarPedido(@RequestBody CrearPedido datosPedido, UriComponentsBuilder uriComponentsBuilder){
         Pedido pedido = pedidoService.crearPedido(datosPedido);

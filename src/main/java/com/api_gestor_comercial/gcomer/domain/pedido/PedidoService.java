@@ -60,6 +60,10 @@ public class PedidoService {
         return pedidoRepository.findByEnviadoTrueAndFechaDePedidoBetween(startDate, endDate, pageable);
     }
 
+    public Page<Pedido> findByFormaDePagoByDay(String formaDePago, Pageable pageable){
+        return pedidoRepository.findByFormaDePagoAndFechaDePedido(formaDePago, LocalDate.now(), pageable);
+    }
+
     @Transactional
     public boolean delete(Long id) {
         if (pedidoRepository.existsById(id)) {
@@ -98,6 +102,7 @@ public class PedidoService {
         }
 
         pedido.setProductos(nuevosProductos);
+        pedido.setFormaDePago(datosActualizarPedido.formaDePago());
         pedido.setPrecioTotal(precioTotal);
     }
 
@@ -127,6 +132,7 @@ public class PedidoService {
         pedido.setCliente(cliente);
         pedido.setProductos(productosMap);
         pedido.setPrecioTotal(precioTotal);
+        pedido.setFormaDePago(crearPedido.formaDePago());
 
         return pedidoRepository.save(pedido);
     }
